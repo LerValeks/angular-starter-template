@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: angular-starter-postgres
+    environment:
+      POSTGRES_DB: angular_starter_db
+      POSTGRES_USER: angular_user
+      POSTGRES_PASSWORD: angular_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - angular-network
+
+  # Redis for Caching (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: angular-starter-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - angular-network
+
+  # pgAdmin for Database Management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: angular-starter-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@angular-starter.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8080:80"
+    networks:
+      - angular-network
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+
+networks:
+  angular-network:
+    driver: bridge
